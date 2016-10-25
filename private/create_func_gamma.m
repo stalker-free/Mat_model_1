@@ -12,7 +12,44 @@ function gamma = create_func_gamma(const,da_func, x_interval)
 %	Elements with odd index must be positive, even -- negative.
 %
 %	See also CREATE_FUNC_DA, SYM, SOLVE, MATLABFUNCTION, class CONST.
+B = @(n, x_m)(const.b(n) .* ...
+    exp(-2.0 .* const.happa(n) .* x_m ./ ...
+    da_func(1i .* const.happa(n))));
+A = eye(const.N, const.N);
 
+C = @(A_matr, n, x_m)(A_matr - ...
+    sum(1i .* B(n, x_m) ./ (const.happa(n) + const.happa)));
+
+m_s = max(size(x_interval));
+% gamma = zeros(const.N, m_s);
+% for j = 1:const.N
+%     for k = 1:m_s
+%         gamma(j, k) = 
+%     end
+% end
+
+gamma_aux = B(1:const.N, x_interval) / C(A, 1:const.N, x_interval);
+gamma_poly = cell(1,const.N);
+for k = 1:const.N
+    gamma_poly{k} = polyfit(x_interval,gamma_aux(k,:),5);
+end
+% for k = 1:const.N
+%     gamma_val{k} = containers.Map('KeyType', 'double', 'ValueType', 'any');
+%     for l = 1:m_s
+%         gamma_val{k}(x_interval(l)) = gamma_aux(k,l);
+%     end
+% end
+% function val = g_f(x)
+%     val = zeros(1,const.N);
+%     for p = 1:const.N
+%         val(p) = gamma_val{p}(x);
+%     end
+% end
+gamma = cell(1,const.N);
+for k = 1:const.N
+    gamma{k} = @(x)polyval(gamma_poly{k},x);
+end
+end
 %     function s_f = gen_s(n)
 %         function s_val = s_aux(x)
 %             s_val = 0;

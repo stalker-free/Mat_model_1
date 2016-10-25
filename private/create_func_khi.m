@@ -13,11 +13,11 @@ function khi = create_func_khi(const,gamma)
 %
 %	See also CREATE_FUNC_GAMMA, class CONST.
     function khi_val = khi_aux(x,k)
-%         khi_val = 1;
-%         for n = 1:const.N
-%             khi_val = khi_val + gamma{n}(x) ./ (k - 1i .* const.happa(n));
-%         end
-        khi_val = 1.0 + sum(gamma(x)./(k-1i*const.happa));
+        khi_val = 1;
+        for n = 1:const.N
+            khi_val = khi_val + gamma{n}(x) ./ (k - 1i .* const.happa(n));
+        end
+%       khi_val = 1.0 + sum(gamma(x)./(k-1i*const.happa));
     end
     khi = @khi_aux;
 end
