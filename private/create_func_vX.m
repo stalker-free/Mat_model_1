@@ -13,12 +13,16 @@ function vX = create_func_vX(funcs_t, const_vect, p)
     end
 
     function [ax0, ax1, ax3] = vX_aux(t,x)
-        res = const_vect + ...
-            p * integral(@(nu)e_aux(nu, 1),0,t + x) - ...
-            p * integral(@(nu)e_aux(nu, 2),0,t - x);
-        ax0 = res(1);
-        ax1 = res(2);
-        ax3 = res(3);
+        res = zeros(3,length(t));
+        for k = 1:length(res)
+            res(:,k) = const_vect + ...
+              p * integral(@(nu)e_aux(nu, 1), 0, t(k) + x(k), ...
+              'ArrayValued',true) - p * integral(@(nu)e_aux(nu, 2), ...
+              0, t(k) - x(k), 'ArrayValued',true);
+        end
+        ax0 = res(1,:);
+        ax1 = res(2,:);
+        ax3 = res(3,:);
     end
     vX = @vX_aux;
 end

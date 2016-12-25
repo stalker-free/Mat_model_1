@@ -17,7 +17,6 @@ function khi = create_func_khi(const,gamma)
         for n = 1:const.N
             khi_val = khi_val + gamma{n}(x) ./ (k - 1i .* const.happa(n));
         end
-%       khi_val = 1.0 + sum(gamma(x)./(k-1i*const.happa));
     end
     khi = @khi_aux;
 end

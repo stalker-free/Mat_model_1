@@ -25,7 +25,10 @@ classdef consts
                 obj.b = 0.25;
                 return
             end
-            assert(isnumeric([n, Happa, B]), 'Input values must be numeric.')
+            assert(isvector([Happa, B]), ...
+                'Input values (exclude quantity) must be vectors.')
+            assert(isnumeric([n, Happa, B]), ...
+                'Input values must be numeric.')
             assert(n >= 1, 'N must be positive.')
             assert(all(Happa > 0.0), 'All Happa must be positive.')
             assert((B(1:2:n) > 0.0) && ((n < 2) || (B(2:2:n) < 0.0)), ...
@@ -33,6 +36,12 @@ classdef consts
             obj.N = uint8(n);
             obj.happa = Happa;
             obj.b = B;
+            if(~iscolumn(obj.happa))
+                obj.happa = obj.happa.';
+            end
+            if(~iscolumn(obj.b))
+                obj.b = obj.b.';
+            end
         end
     end
     
