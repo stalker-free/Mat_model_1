@@ -10,7 +10,7 @@ res = zeros(3,length(t));
 
 tol = 1e-12;
 
-parfor k = 1:length(res)
+for k = 1:length(res)
 % b0 = const_vect(1) + p * integral(@(nu)b_0(nu, 1), tol, t(k) + x(k), ...
 %     'ArrayValued', true) - p * integral(@(nu)b_0(nu, 2), tol, ...
 %      t(k) - x(k), 'ArrayValued', true);
