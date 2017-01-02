@@ -15,11 +15,13 @@ function gamma = create_func_gamma(const, da_func, x_interval)
 
 % Solve Cx = B algebraic equation
 function B_val = B(n, x_m)
-    B_val = exp(-2.0 * const.happa(n) * x_m);
-    for k = n
-        B_val(k,:) = ...
-            B_val(k,:) .* const.b(k) ./ da_func(1i * const.happa(k));
-    end
+ B_val = exp(-2.0 * const.happa(n) * x_m);
+
+ for m = n
+  B_val(m,:) = ...
+     B_val(m,:) .* const.b(m) ./ da_func(1i * const.happa(m));
+ end
+
 end
 
 % Get values from solution function...
@@ -42,15 +44,30 @@ gamma_aux = zeros(size(B_temp));
 for k = 1:size(C,2)
     gamma_aux(:,k) = C{k} \ B_temp(:,k);
 end
+%gamma = gamma_aux;
 %figure
 %plot(x_interval, imag(gamma_aux), '-')
 
 % ...and present them as "continuous function"
 gamma = cell(1, const.N);
-%spl = cell(1, const.N);
+spl = cell(1, const.N);
 for k = 1:const.N
-    %spl{k} = spline(x_interval, gamma_aux(k,:));
-    %gamma{k} = @(x)ppval(spl{k}, x);
-    gamma{k} = @sin;
+   %spl{k} = spline(x_interval, gamma_aux(k,:));
+   %gamma{k} = @(x)ppval(spl{k}, x);
+   spl{k} = griddedInterpolant(x_interval, gamma_aux(k,:), 'spline');
+   gamma{k} = @(x)spl{k}(x);
+   %gamma{k} = @(x)power((x - 2 + 0.3i),-exp(1.0));
 end
 end
+% function val = gamma_f(g_v, x)
+%     tol = 1e-12;
+%     found_s = ismembertol(x_interval, x, tol);
+%     val = g_v(found_s);
+% end
+% 
+% gamma = cell(1,const.N);
+% for k = 1:const.N
+%     gamma{k} = @(x)gamma_f(gamma_aux(k,:),x);
+% end
+% 
+% end

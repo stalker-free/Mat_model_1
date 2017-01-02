@@ -6,5 +6,8 @@ function draw_x_i(t_interval, x_i)
 
 figure
 plot(x_i, t_interval)
+xlabel('State')
+ylabel('Time')
+title('State of quaziparticles')
 end
 

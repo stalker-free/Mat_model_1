@@ -31,7 +31,8 @@ classdef consts
                 'Input values must be numeric.')
             assert(n >= 1, 'N must be positive.')
             assert(all(Happa > 0.0), 'All Happa must be positive.')
-            assert((B(1:2:n) > 0.0) && ((n < 2) || (B(2:2:n) < 0.0)), ...
+            assert(all(B(1:2:n) > 0.0) && ...
+                ((n < 2) || all(B(2:2:n) < 0.0)), ...
                 'Incorrect b initialisation.')
             obj.N = uint8(n);
             obj.happa = Happa;
