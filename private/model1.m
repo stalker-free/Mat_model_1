@@ -1,10 +1,10 @@
 % Step 1,2
 [filename,dirname] = uigetfile('*.*', 'Choose file input...');
 [const_plus, const_minus] = data_load(cat(2,dirname,filename));
-% a_plus = create_func_a(const_plus);
-% a_minus = create_func_a(const_minus);
 %const_plus = consts(2, [0.6 1.5], [0.7 -0.3]);
 % Step 3
+% a_plus = create_func_a(const_plus);
+% a_minus = create_func_a(const_minus);
 da_plus = create_func_da(const_plus);
 da_minus = create_func_da(const_minus);
 [x_interval, t_interval] = form_intervals(1000, -100.0, 100.0, 0.0, 100.0);
@@ -12,14 +12,14 @@ da_minus = create_func_da(const_minus);
 gamma_plus = create_func_gamma(const_plus, da_plus, x_interval);
 gamma_minus = create_func_gamma(const_minus, da_minus, x_interval);
 % Step 5
-khi_plus = create_func_khi(const_plus, gamma_plus);
-khi_minus = create_func_khi(const_minus, gamma_minus);
+khi_plus = @(x, k)khi(const_plus, gamma_plus, x, k);
+khi_minus = @(x, k)khi(const_minus, gamma_minus, x, k);
 % Step 6
 c_integral = [1.25 0.65];
 pieces = 10000;
 t_matr = create_functional_t(c_integral,khi_plus,khi_minus,pieces);
 % Step 7
-F_func = create_func_F(t_matr);
+F_func = @(t, x)determinate_T(t_matr, t, x);
 
 % f_plot = zeros(1,length(t_interval));
 % for f_i = 1:length(f_plot)
