@@ -6,8 +6,9 @@ function x_i = find_F_zero(t_interval, F_func, init_point)
 %
 %	See also CREATE_FUNCTIONAL_T, CREATE_FUNC_F.
 s = length(t_interval);
-opts = optimoptions('fsolve', 'Display', 'none', ...
-    'Algorithm', 'levenberg-marquardt');
+% opts = optimoptions('fsolve', 'Display', 'none', ...
+%     'Algorithm', 'levenberg-marquardt');
+opts = optimoptions('fsolve', 'Display', 'none');
 x_i = zeros(1,s);
 % x_i = arrayfun(@(t)fsolve(@(x)F_func(t, x), init_point, opts), t_interval);
 x_i(1) = fsolve(@(x)F_func(t_interval(1), x), init_point, opts);

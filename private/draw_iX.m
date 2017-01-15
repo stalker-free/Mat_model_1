@@ -3,10 +3,15 @@ function [] = draw_iX(x0,x1,x3)
 %
 % See also CREATE_FUNCTIONAL_T, FIND_F_ZERO, DRAW_X_I.
 figure
-plot3(x1,x3,x0)
+hold on
+for r = 1:length(x1(:,1))
+    plot3(x1(r,:),x3(r,:),x0(r,:))
+end
+%surf(x1,x3,x0)
 xlabel('X1')
 ylabel('X3')
 zlabel('X0')
 title('World lines of quaziparticles')
+hold off
 end
 

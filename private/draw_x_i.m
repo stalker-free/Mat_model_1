@@ -8,6 +8,7 @@ figure
 plot(x_i, t_interval)
 xlabel('State')
 ylabel('Time')
+grid on
 title('State of quaziparticles')
 end
 

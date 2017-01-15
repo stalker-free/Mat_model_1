@@ -25,14 +25,13 @@ function B_val = B(n, x_m)
 end
 
 % Get values from solution function...
-B_temp = B(1:const.N, x_interval);
-%C = cell(1,size(x_interval,2));
-%for k = 1:size(C,2)
-C = cell(1,length(x_interval));
+x_temp = linspace(x_interval(1), x_interval(end), ...
+    ceil(sqrt(length(x_interval))));
+B_temp = B(1:const.N, x_temp);
+C = cell(1, length(x_temp));
 for k = 1:length(C)
     C{k} = eye(const.N, const.N);
     for i_ = 1:const.N
-        %b = 1i .* B(i, x_interval(k));
         for j_ = 1:const.N
             C{k}(i_,j_) = C{k}(i_,j_) - 1i .* ...
                 B_temp(i_,k) ./ (const.happa(i_) + const.happa(j_));
@@ -41,33 +40,19 @@ for k = 1:length(C)
 end
 
 gamma_aux = zeros(size(B_temp));
-for k = 1:size(C,2)
+for k = 1:length(C)
     gamma_aux(:,k) = C{k} \ B_temp(:,k);
 end
-%gamma = gamma_aux;
 %figure
 %plot(x_interval, imag(gamma_aux), '-')
 
 % ...and present them as "continuous function"
 gamma = cell(1, const.N);
 spl = cell(1, const.N);
+
 for k = 1:const.N
-   %spl{k} = spline(x_interval, gamma_aux(k,:));
-   %gamma{k} = @(x)ppval(spl{k}, x);
-   spl{k} = griddedInterpolant(x_interval, gamma_aux(k,:), 'spline');
+   spl{k} = griddedInterpolant(x_temp, gamma_aux(k,:), 'spline');
    gamma{k} = @(x)spl{k}(x);
-   %gamma{k} = @(x)power((x - 2 + 0.3i),-exp(1.0));
 end
+
 end
-% function val = gamma_f(g_v, x)
-%     tol = 1e-12;
-%     found_s = ismembertol(x_interval, x, tol);
-%     val = g_v(found_s);
-% end
-% 
-% gamma = cell(1,const.N);
-% for k = 1:const.N
-%     gamma{k} = @(x)gamma_f(gamma_aux(k,:),x);
-% end
-% 
-% end
