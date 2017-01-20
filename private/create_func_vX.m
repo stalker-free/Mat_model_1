@@ -6,6 +6,10 @@ function vX = create_func_vX(funcs_t, const_vect, p, pieces)
 %	See also CREATE_FUNCTIONAL_T.
 
 function [ax0, ax1, ax3] = vX_aux(t,x)
+    
+% t = (t_-min(t_))./(max(t_)-min(t_));
+% x = (x_-min(x_))./(max(x_)-min(x_));
+
 res = zeros(3,length(t));
 
 tol = 1e-12;
@@ -30,18 +34,18 @@ if(abs(pl) > tol)
     if(pl < 0.0)
         lin1 = flip(lin1);
     end;
-    b0 = b0 + p * trapz(lin1, b_0(funcs_t,lin1, 1));
-    b1 = b1 + p * trapz(lin1, b_1(funcs_t,lin1, 1));
-    b3 = b3 + p * trapz(lin1, b_3(funcs_t,lin1, 1));
+    b0 = b0 + p * trapz(lin1, b_0(funcs_t, lin1, 1));
+    b1 = b1 + p * trapz(lin1, b_1(funcs_t, lin1, 1));
+    b3 = b3 + p * trapz(lin1, b_3(funcs_t, lin1, 1));
 end
 if(abs(mi) > tol)
     lin2 = linspace(tol, mi, pieces);
     if(mi < 0.0)
         lin2 = flip(lin2);
     end;
-    b0 = b0 - p * trapz(lin2, b_0(funcs_t,lin2, 2));
-    b1 = b1 - p * trapz(lin2, b_1(funcs_t,lin2, 2));
-    b3 = b3 - p * trapz(lin2, b_3(funcs_t,lin2, 2));    
+    b0 = b0 - p * trapz(lin2, b_0(funcs_t, lin2, 2));
+    b1 = b1 - p * trapz(lin2, b_1(funcs_t, lin2, 2));
+    b3 = b3 - p * trapz(lin2, b_3(funcs_t, lin2, 2));    
 end
 res(:,k) = [b0 b1 b3];
 end
