@@ -7,7 +7,7 @@
 % a_minus = create_func_a(const_minus);
 da_plus = create_func_da(const_plus);
 da_minus = create_func_da(const_minus);
-[x_interval, t_interval] = form_intervals(2000, -3.0, 3.0, 0.0, 10.0);
+[x_interval, t_interval] = form_intervals(2000, -3.0, 3.0, 0.0, 2.0);
 % Step 4
 gamma_plus = create_func_gamma(const_plus, da_plus, x_interval);
 gamma_minus = create_func_gamma(const_minus, da_minus, x_interval);
@@ -60,7 +60,7 @@ for idx = wave_count:-1:1
 end
 for idx = wave_count:-1:1
    [completedIdx,value] = fetchNext(fObj);
-	x_i(completedIdx,:) = value;
+   x_i(completedIdx,:) = value;
    fObj2(idx) = parfeval(poolobj, vX, 3, t_interval, x_i(completedIdx,:));
 end
 
@@ -74,5 +74,5 @@ for idx = 1:wave_count
 end
 
 draw_iX(x0,x1,x3);
-delete(poolobj)
+% delete(poolobj)
 clear fObj fObj2
