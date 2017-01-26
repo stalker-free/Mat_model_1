@@ -1,19 +1,23 @@
-function t_funcs = create_functional_t(c_integral, conf, ...
-    khi_plus, khi_minus, pie, plus_zero, minus_zero)
+function t_funcs = create_functional_t(khi_plus,khi_minus,d_plus,d_minus)
+% function t_funcs = create_functional_t(c_integral, conf, ...
+%     khi_plus, khi_minus, pie, plus_zero, minus_zero)
 % CREATE_FUNCTIONAL_T Creates t(x) functions.
 %	T(x) = CREATE_FUNCTIONAL_T(INTEGRAL_CONSTANT, KHI+, KHI-)
 %	Creates four t(x) functions, packed in 2x2 cell array.
 %
 %	See also CREATE_FUNC_KHI.
 
-tol = 1e-12;
+%tol = 1e-12;
 t_funcs = cell(2);
 t_funcs{1,2} = @(x)t2_(khi_plus, x);
 t_funcs{2,2} = @(x)t2_(khi_minus, x);
-t_funcs{1,1} = @(x)t1_(c_integral(1), khi_plus, plus_zero, pie, ...
-    tol, conf, x);
-t_funcs{2,1} = @(x)t1_(c_integral(2), khi_minus, minus_zero, pie, ...
-    tol, conf, x);
+% Get to real numbers.
+t_funcs{1,1} = @(x)(d_plus(x, 0.0) .* 1i + x .* khi_plus(x, 0.0));
+t_funcs{2,1} = @(x)(d_minus(x, 0.0) .* 1i + x .* khi_minus(x, 0.0));
+% t_funcs{1,1} = @(x)t1_(c_integral(1), khi_plus, plus_zero, pie, ...
+%     tol, conf, x);
+% t_funcs{2,1} = @(x)t1_(c_integral(2), khi_minus, minus_zero, pie, ...
+%     tol, conf, x);
 
 end
 
@@ -41,12 +45,15 @@ if(any(ch))
         end
     else
         prelin = x(ch);
-        if(all(prelin >= 0.0))
+        if(~any(prelin < 0.0))
           lin = [(prelin(1)-cf) zero(zero >= 0.0 & zero <= prelin(end)) ...
                 (prelin(end)+cf)];
-        else
+        elseif(~any(prelin > 0.0))
           lin = [(prelin(1)-cf) zero(zero >= prelin(1) & zero < 0.0) ...
                 (prelin(end)+cf)];
+        else
+          lin = [prelin(1) zero prelin(end)];
+          lin = sort(lin);
         end
         for li = 1:length(lin)-1
             pies = prelin( (prelin >= (lin(li) + cf)) & ...
