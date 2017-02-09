@@ -7,7 +7,7 @@
 % a_minus = create_func_a(const_minus);
 da_plus = create_func_da(const_plus);
 da_minus = create_func_da(const_minus);
-[x_interval, t_interval] = form_intervals(2000, -3.0, 3.0, 0.0, 2.0);
+[x_interval, t_interval] = form_intervals(2000, -10.0, 10.0, -5.0, 5.0);
 % Step 4
 gamma_plus = create_func_gamma(const_plus, da_plus, x_interval);
 gamma_minus = create_func_gamma(const_minus, da_minus, x_interval);
@@ -16,18 +16,27 @@ khi_plus = @(x, k)khi(const_plus, gamma_plus, x, k);
 khi_minus = @(x, k)khi(const_minus, gamma_minus, x, k);
 % Step 6
 c_integral = [1.25 0.65];
+
 pieces = 1500;
-% plus_zero = find_khi_zero(khi_plus, x_interval, const_plus);
-% minus_zero = find_khi_zero(khi_minus, x_interval, const_minus);
+poolobj = gcp();
+tol = 1e-4;
+plus_zero = find_khi_zero(khi_plus, x_interval, pieces, tol);
+minus_zero = find_khi_zero(khi_minus, x_interval, pieces, tol);
+if(isempty(plus_zero) || isempty(minus_zero))
+    disp('Zeros of khi haven`t been found.');
+    return;
+end
+
 % d_plus = diff(khi_plus(x_interval,0.0))./(x_interval(2)-x_interval(1));
 % d_minus = diff(khi_minus(x_interval,0.0))./(x_interval(2)-x_interval(1));
 d_plus = @(x, k)dKhi(const_plus, gamma_plus, x, k);
 d_minus = @(x, k)dKhi(const_minus, gamma_minus, x, k);
-t_matr = create_functional_t(khi_plus, khi_minus, d_plus, d_minus);
+t_matr = create_functional_t(x_interval, khi_plus, khi_minus, d_plus, d_minus);
 % t_matr = create_functional_t(c_integral, 0.1, khi_plus, khi_minus, ...
 %     pieces, plus_zero, minus_zero);
 % Step 7
-F_func = @(t, x)determinate_T(t_matr, t, x);
+[f_plus, f_minus] = determinate_T(t_matr);
+F_func = @(t, x)(f_minus(t, x) - f_plus(t, x));
 % F_f = generate_T_values(F_func, t_interval, x_interval);
 % mesh(x_interval,t_interval,F_f);
 
@@ -38,29 +47,36 @@ F_func = @(t, x)determinate_T(t_matr, t, x);
 % figure
 % plot(x_interval(1:length(x_interval)), f_plot)
 % Step 8,9
-wave_count = const_plus.N + const_minus.N;
+% wave_count = const_plus.N + const_minus.N;
 
-init_point = linspace(x_interval(1) - 1e-12, x_interval(end) + 1e-12, ...
-    wave_count + 1);
-init_point = (init_point(2:end) + init_point(1:end-1)) ./ 2;
-% init_point = sort([plus_zero minus_zero]) + 1e-10;
+% init_point = linspace(x_interval(1) - 1e-12, x_interval(end) + 1e-12, ...
+%     wave_count + 1);
+init_point = sort(uniquetol([(x_interval(1) + t_interval(1)) plus_zero ...
+    minus_zero (x_interval(end) + t_interval(end))], tol)) + 1e-10;
+% init_point = (init_point(2:end) + init_point(1:end-1)) ./ 2.0;
+wave_count = length(init_point)-1;
 
 x_i = zeros(wave_count, length(t_interval));
-
+exitflag = zeros(wave_count, length(t_interval));
 zero_vect = zeros(1,3);
 vX = create_func_vX(t_matr, zero_vect, 1.0, pieces);
 x0 = zeros(size(x_i));
 x1 = zeros(size(x_i));
 x3 = zeros(size(x_i));
 
-poolobj = gcp();
 for idx = wave_count:-1:1
-   fObj(idx) = parfeval(poolobj, @find_F_zero, 1, ...
-       t_interval, F_func, init_point(idx) );
+    param = struct;
+    param.plus = plus_zero;
+    param.minus = minus_zero;
+    param.seg = [init_point(idx) init_point(idx+1)];
+    param.tol = tol;
+   fObj(idx) = parfeval(poolobj, @find_F_zero, 2, ...
+       t_interval, F_func, param );
 end
 for idx = wave_count:-1:1
-   [completedIdx,value] = fetchNext(fObj);
+   [completedIdx,value,extval] = fetchNext(fObj);
    x_i(completedIdx,:) = value;
+   exitflag(completedIdx,:) = extval;
    fObj2(idx) = parfeval(poolobj, vX, 3, t_interval, x_i(completedIdx,:));
 end
 

@@ -1,4 +1,5 @@
-function t_funcs = create_functional_t(khi_plus,khi_minus,d_plus,d_minus)
+function t_funcs = create_functional_t(x_int, khi_plus, khi_minus, ...
+    d_plus, d_minus)
 % function t_funcs = create_functional_t(c_integral, conf, ...
 %     khi_plus, khi_minus, pie, plus_zero, minus_zero)
 % CREATE_FUNCTIONAL_T Creates t(x) functions.
@@ -12,8 +13,22 @@ t_funcs = cell(2);
 t_funcs{1,2} = @(x)t2_(khi_plus, x);
 t_funcs{2,2} = @(x)t2_(khi_minus, x);
 % Get to real numbers.
-t_funcs{1,1} = @(x)(d_plus(x, 0.0) .* 1i + x .* khi_plus(x, 0.0));
+t_funcs{1,1} = @(x)-(d_plus(x, 0.0) .* 1i + x .* khi_plus(x, 0.0));
 t_funcs{2,1} = @(x)(d_minus(x, 0.0) .* 1i + x .* khi_minus(x, 0.0));
+
+coef_plus = sqrt( abs( sum( t_funcs{1,2}(x_int(1:end-1)) .* ...
+    diff(t_funcs{1,1}(x_int)) - ...
+    diff(t_funcs{1,2}(x_int)) .* t_funcs{1,1}(x_int(1:end-1)) )));
+coef_minus = sqrt( abs( sum( t_funcs{2,2}(x_int(1:end-1)) .* ...
+    diff(t_funcs{2,1}(x_int)) - ...
+    diff(t_funcs{2,2}(x_int)) .* t_funcs{2,1}(x_int(1:end-1)) )));
+
+t_funcs{1,2} = @(x)(t2_(khi_plus, x) ./ coef_plus);
+t_funcs{2,2} = @(x)(t2_(khi_minus, x) ./ coef_minus);
+
+t_funcs{1,1} = @(x)(-(d_plus(x,0.0).*1i+x.*khi_plus(x,0.0))./coef_plus);
+t_funcs{2,1} = @(x)((d_minus(x,0.0).*1i+x.*khi_minus(x,0.0))./coef_minus);
+
 % t_funcs{1,1} = @(x)t1_(c_integral(1), khi_plus, plus_zero, pie, ...
 %     tol, conf, x);
 % t_funcs{2,1} = @(x)t1_(c_integral(2), khi_minus, minus_zero, pie, ...

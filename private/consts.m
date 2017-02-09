@@ -12,7 +12,7 @@ classdef consts
     end
     
     methods
-        function obj = consts(n, Happa, B)
+        function obj = consts(n, Happa, B, varargin)
             % Constructor for CONST object. 
             % [CONST] = CONST(N, HAPPA, B) or [CONST] = CONST()
             % Before assignment tries run default constructor statements,
@@ -42,6 +42,12 @@ classdef consts
             end
             if(~iscolumn(obj.b))
                 obj.b = obj.b.';
+            end
+            for v_s = 1:length(varargin)
+                switch varargin{v_s}
+                    case 'InverseB'
+                        obj.b = -obj.b;
+                end
             end
         end
     end
