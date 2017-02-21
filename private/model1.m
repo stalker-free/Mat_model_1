@@ -7,7 +7,7 @@
 % a_minus = create_func_a(const_minus);
 da_plus = create_func_da(const_plus);
 da_minus = create_func_da(const_minus);
-[x_interval, t_interval] = form_intervals(2000, -10.0, 10.0, -5.0, 5.0);
+[x_interval, t_interval] = form_intervals(2000, -5.0, 5.0, -10.0, 10.0);
 % Step 4
 gamma_plus = create_func_gamma(const_plus, da_plus, x_interval);
 gamma_minus = create_func_gamma(const_minus, da_minus, x_interval);
@@ -46,15 +46,30 @@ F_func = @(t, x)(f_minus(t, x) - f_plus(t, x));
 % end
 % figure
 % plot(x_interval(1:length(x_interval)), f_plot)
-% Step 8,9
-% wave_count = const_plus.N + const_minus.N;
 
-% init_point = linspace(x_interval(1) - 1e-12, x_interval(end) + 1e-12, ...
-%     wave_count + 1);
-init_point = sort(uniquetol([(x_interval(1) + t_interval(1)) plus_zero ...
-    minus_zero (x_interval(end) + t_interval(end))], tol)) + 1e-10;
-% init_point = (init_point(2:end) + init_point(1:end-1)) ./ 2.0;
-wave_count = length(init_point)-1;
+% Step 8,9
+stationary_points = sort(uniquetol([(x_interval(1) + t_interval(1)) ...
+  plus_zero minus_zero (x_interval(end) + t_interval(end))], tol)) + 1e-10;
+
+% init_point = (stationary_points(2:end) + stationary_points(1:end-1))./2.0;
+
+wave_count = length(stationary_points) - 1;
+asymptote_points = cell(1, wave_count + 1);
+for idx = 1:length(stationary_points)
+    if(sum(ismembertol(stationary_points(idx), plus_zero, tol)) > 0)
+        asymptote_points{idx} = @(t)(stationary_points(idx) - t);
+    elseif(sum(ismembertol(stationary_points(idx), minus_zero, tol)) > 0)
+        asymptote_points{idx} = @(t)(stationary_points(idx) + t);
+    else
+        asymptote_points{idx} = @(t)(stationary_points(idx) .* ...
+            (1.0 + sqrt( 1.0 + abs(t) ) ) );
+    end
+end
+
+% for idx=wave_count:-1:1
+%     init_point(idx) = (asymptote_points{idx}(t_interval(1)) + ...
+%         asymptote_points{idx + 1}(t_interval(1)) ) ./ 2.0;
+% end
 
 x_i = zeros(wave_count, length(t_interval));
 exitflag = zeros(wave_count, length(t_interval));
@@ -66,11 +81,11 @@ x3 = zeros(size(x_i));
 
 for idx = wave_count:-1:1
     param = struct;
-    param.plus = plus_zero;
-    param.minus = minus_zero;
-    param.seg = [init_point(idx) init_point(idx+1)];
+    param.idx = idx;
+    param.asymptote = asymptote_points;
+    param.center = ceil(length(t_interval)./2);
     param.tol = tol;
-   fObj(idx) = parfeval(poolobj, @find_F_zero, 2, ...
+    fObj(idx) = parfeval(poolobj, @find_F_zero, 2, ...
        t_interval, F_func, param );
 end
 for idx = wave_count:-1:1

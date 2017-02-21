@@ -5,57 +5,61 @@ function [x_i, exitflag] = find_F_zero(t_interval, F_func, param)
 %   _i lies in [1, quantity_of_x_zeros].
 %
 %	See also CREATE_FUNCTIONAL_T, CREATE_FUNC_F.
-init = param.seg;
-pl = ismembertol(init,param.plus,param.tol);
-mi = ismembertol(init,param.minus,param.tol);
-init_point = {@(t)param.seg(1) @(t)param.seg(2)};
-if(sum(pl)==1)
-    init_point{pl} = @(t)(init(pl) - t);
-end
-if(sum(mi)==1)
-    init_point{mi} = @(t)(init(mi) + t);
-end
+
+cnt = param.center;
+
+init = (param.asymptote{param.idx}(t_interval(cnt)) + ...
+     param.asymptote{param.idx + 1}(t_interval(cnt)) ) ./ 2.0;
+
+[a, b] = getNearest(param.asymptote, init, t_interval(cnt));
+
 s = length(t_interval);
-% opts = optimoptions('fsolve', 'Display', 'none');%, ...
-%    'Algorithm', 'levenberg-marquardt');
 opts = optimset('Display', 'none', 'TolFun', param.tol, 'TolX', param.tol);
 x_i = zeros(1,s);
 exitflag = zeros(1,s);
-% x_i = arrayfun(@(t)fsolve(@(x)F_func(t, x), init_point, opts), t_interval);
-% [x_i(1),~,exitflag(1)] = fsolve(@(x)F_func(t_interval(1), x), init_point, opts);
-% x_i(1) = fminsearch(@(x)F_func(t_interval(1), x), init_point);
 
-threshhold = (init_point{1}(t_interval(1)) + ...
-    init_point{2}(t_interval(1))) ./ 2.0;
-[x_i(1), ~, ~, exitflag(1)] = lsqnonlin(@(x)F_func(t_interval(1), x), ...
-   threshhold, init_point{1}(t_interval(1)), ...
-   init_point{2}(t_interval(1)), opts);
-threshhold = threshhold .* 1e-3;
+[x_i(cnt),~,~,exitflag(cnt)] = lsqnonlin(@(x)F_func( ...
+    t_interval(cnt), x), init, a, b, opts);
+noise = init .* 0e-3 .* length(param.asymptote);
+threshhold = length(t_interval) - cnt;
 
-% threshhold = (param.seg(1) + param.seg(2)) ./ 2.0;
-% [x_i(1), ~, ~, exitflag(1)] = lsqnonlin(@(x)F_func(t_interval(1), x), ...
-%    threshhold, param.seg(1), param.seg(2), opts);
-% threshhold = threshhold .* 1e-3;
+for i=1:threshhold
 
-for i=2:s
-%     x_i(i) = fminsearch(@(x)F_func(t_interval(i), x), x_i(i-1));
-%     if(mod(t_interval(i), 1.25) <= 1e-12)
-%         x_i(i) = fsolve(@(x)F_func(t_interval(i), x), init_point, opts);
-%     else
-%     [x_i(i), ~, exitflag(i)] = fsolve(@(x)F_func(t_interval(i), x), ...
-%         x_i(i-1) + t_interval(i) .* threshhold, opts);
-[x_i(i), ~, ~, exitflag(i)] = lsqnonlin(@(x)F_func(t_interval(i), x), ...
-    x_i(i - 1) + t_interval(i) .* threshhold, ...
-    init_point{1}(t_interval(i)), ...
-    init_point{2}(t_interval(i)), opts);
-%     end
+% First half
+k = cnt - i;
+[a, b] = getNearest(param.asymptote, x_i(k + 1), t_interval(k));
+[x_i(k), ~, ~, exitflag(k)] = lsqnonlin(@(x)F_func(t_interval(k), x), ...
+    x_i(k + 1) + t_interval(k) .* noise, a, b, opts);
+
+% Second half
+k = cnt + i;
+[a, b] = getNearest(param.asymptote, x_i(k - 1), t_interval(k));
+[x_i(k), ~, ~, exitflag(k)] = lsqnonlin(@(x)F_func(t_interval(k), x), ...
+    x_i(k - 1) + t_interval(k) .* noise, a, b, opts);
+
 end
 
-% i_ = 1;
-% while(i_ <= s)
-% x_i(1+100.*(i_-1)) = fsolve(@(x)F_func(t_interval(1+100.*(i_-1)), x), ...
-%     init_point, opts);
-% for j_ = 2 + 100 * (i_ - 1):100 * i_
-%     x_i(j_) = fsolve(@(x)F_func(t_interval(j_), x), x_i(j_-1), opts);
-% end
-% end
+end
+
+function [a,b] = getNearest(asymptote, init, ti)
+    for i=length(asymptote):-1:1
+        asympt_temp(i) = asymptote{i}(ti);
+    end
+%     asympt_temp = sort(asympt_temp);
+%     a = find(asympt_temp .* (asympt_temp < init), 1, 'last');
+    a = asympt_temp(asympt_temp < init) - init;
+    if(~isempty(a))
+        a = min(abs(a)) .* sign(a) + init;
+        a = a(1);
+    else
+        a = min(asympt_temp);
+    end
+%     b = find(asympt_temp .* (asympt_temp > init), 1);
+    b = asympt_temp(asympt_temp > init) - init;
+    if(~isempty(b))
+        b = min(abs(b)) .* sign(b) + init;
+        b = b(1);
+    else
+        b = max(asympt_temp);
+    end
+end
