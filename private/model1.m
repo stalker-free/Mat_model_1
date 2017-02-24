@@ -7,7 +7,7 @@
 % a_minus = create_func_a(const_minus);
 da_plus = create_func_da(const_plus);
 da_minus = create_func_da(const_minus);
-[x_interval, t_interval] = form_intervals(2000, -5.0, 5.0, -10.0, 10.0);
+[x_interval, t_interval] = form_intervals(4000, -5.0, 5.0, -10.0, 10.0);
 % Step 4
 gamma_plus = create_func_gamma(const_plus, da_plus, x_interval);
 gamma_minus = create_func_gamma(const_minus, da_minus, x_interval);
@@ -104,6 +104,6 @@ for idx = 1:wave_count
    x3(completedIdx,:) = v3;
 end
 
-draw_iX(x0,x1,x3);
+draw_iX(x0,x1,x3,1,length(x_interval));
 % delete(poolobj)
 clear fObj fObj2
