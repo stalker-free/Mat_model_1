@@ -1,13 +1,11 @@
-% Step 1,2
-[filename,dirname] = uigetfile('*.*', 'Choose file input...');
-[const_plus, const_minus] = data_load(cat(2,dirname,filename));
-%const_plus = consts(2, [0.6 1.5], [0.7 -0.3]);
+function [x_i, x0, x1, x3] = model1(const_plus, const_minus, ...
+    x_interval, t_interval, F_zero)
+
 % Step 3
 % a_plus = create_func_a(const_plus);
 % a_minus = create_func_a(const_minus);
 da_plus = create_func_da(const_plus);
 da_minus = create_func_da(const_minus);
-[x_interval, t_interval] = form_intervals(4000, -5.0, 5.0, -10.0, 10.0);
 % Step 4
 gamma_plus = create_func_gamma(const_plus, da_plus, x_interval);
 gamma_minus = create_func_gamma(const_minus, da_minus, x_interval);
@@ -15,7 +13,7 @@ gamma_minus = create_func_gamma(const_minus, da_minus, x_interval);
 khi_plus = @(x, k)khi(const_plus, gamma_plus, x, k);
 khi_minus = @(x, k)khi(const_minus, gamma_minus, x, k);
 % Step 6
-c_integral = [1.25 0.65];
+% c_integral = [1.25 0.65];
 
 pieces = 1500;
 poolobj = gcp();
@@ -51,8 +49,6 @@ F_func = @(t, x)(f_minus(t, x) - f_plus(t, x));
 stationary_points = sort(uniquetol([(x_interval(1) + t_interval(1)) ...
   plus_zero minus_zero (x_interval(end) + t_interval(end))], tol)) + 1e-10;
 
-% init_point = (stationary_points(2:end) + stationary_points(1:end-1))./2.0;
-
 wave_count = length(stationary_points) - 1;
 asymptote_points = cell(1, wave_count + 1);
 for idx = 1:length(stationary_points)
@@ -66,15 +62,10 @@ for idx = 1:length(stationary_points)
     end
 end
 
-% for idx=wave_count:-1:1
-%     init_point(idx) = (asymptote_points{idx}(t_interval(1)) + ...
-%         asymptote_points{idx + 1}(t_interval(1)) ) ./ 2.0;
-% end
-
 x_i = zeros(wave_count, length(t_interval));
 exitflag = zeros(wave_count, length(t_interval));
 zero_vect = zeros(1,3);
-vX = create_func_vX(t_matr, zero_vect, 1.0, pieces);
+vX = create_func_vX(t_matr, zero_vect, 1.0);
 x0 = zeros(size(x_i));
 x1 = zeros(size(x_i));
 x3 = zeros(size(x_i));
@@ -85,7 +76,7 @@ for idx = wave_count:-1:1
     param.asymptote = asymptote_points;
     param.center = ceil(length(t_interval)./2);
     param.tol = tol;
-    fObj(idx) = parfeval(poolobj, @find_F_zero, 2, ...
+    fObj(idx) = parfeval(poolobj, F_zero, 2, ...
        t_interval, F_func, param );
 end
 for idx = wave_count:-1:1
@@ -95,7 +86,6 @@ for idx = wave_count:-1:1
    fObj2(idx) = parfeval(poolobj, vX, 3, t_interval, x_i(completedIdx,:));
 end
 
-draw_x_i(t_interval, x_i);
 % Step 10
 for idx = 1:wave_count
    [completedIdx,v0,v1,v3] = fetchNext(fObj2);
@@ -104,6 +94,7 @@ for idx = 1:wave_count
    x3(completedIdx,:) = v3;
 end
 
-draw_iX(x0,x1,x3,1,length(x_interval));
 % delete(poolobj)
 clear fObj fObj2
+
+end

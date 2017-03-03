@@ -1,11 +1,11 @@
-function vX = create_func_vX(funcs_t, const_vect, p, pieces)
+function vX = create_func_vX(funcs_t, const_vect, p)
 %CREATE_FUNC_VX Creates vX(t,x).
 %	VX(T,X) = CREATE_FUNC_VX(FUNCS_T, CONST_VECT, P)
 %   Creates vX(t,x) function for use in the graphic.
 %
 %	See also CREATE_FUNCTIONAL_T.
 
-function [ax0, ax1, ax3] = vX_aux(t,x)
+function [ax0, ax1, ax3] = vX_aux(t, x)
     
 % t = (t_-min(t_))./(max(t_)-min(t_));
 % x = (x_-min(x_))./(max(x_)-min(x_));
@@ -21,29 +21,7 @@ b1 = const_vect(2) + p * integral(@(nu)b_1(funcs_t, nu, 1), tol, ...
     t(k)+x(k)) - p * integral(@(nu)b_1(funcs_t, nu, 2), tol, t(k) - x(k));
 b3 = const_vect(3) + p * integral(@(nu)b_3(funcs_t, nu, 1), tol, ...
     t(k)+x(k)) - p * integral(@(nu)b_3(funcs_t, nu, 2), tol, t(k) - x(k));
-% b0 = const_vect(1);
-% b1 = const_vect(2);
-% b3 = const_vect(3);
-% pl = t(k) + x(k);
-% mi = t(k) - x(k);
-% if(abs(pl) > tol)
-%     lin1 = linspace(tol, pl, pieces);
-%     if(pl < 0.0)
-%         lin1 = flip(lin1);
-%     end;
-%     b0 = b0 + p * trapz(lin1, b_0(funcs_t, lin1, 1));
-%     b1 = b1 + p * trapz(lin1, b_1(funcs_t, lin1, 1));
-%     b3 = b3 + p * trapz(lin1, b_3(funcs_t, lin1, 1));
-% end
-% if(abs(mi) > tol)
-%     lin2 = linspace(tol, mi, pieces);
-%     if(mi < 0.0)
-%         lin2 = flip(lin2);
-%     end;
-%     b0 = b0 - p * trapz(lin2, b_0(funcs_t, lin2, 2));
-%     b1 = b1 - p * trapz(lin2, b_1(funcs_t, lin2, 2));
-%     b3 = b3 - p * trapz(lin2, b_3(funcs_t, lin2, 2));    
-% end
+
 res(:,k) = [b0 b1 b3];
 end
 

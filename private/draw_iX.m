@@ -5,7 +5,7 @@ function draw_iX(x0,x1,x3,a,b)
 figure
 hold on
 for r = 1:length(x1(:,1))
-    plot3(x1(r,a:b),x3(r,a:b),x0(r,a:b))
+    plot3(x1(r,a:b), x3(r,a:b), x0(r,a:b), 'LineWidth', 3.0)
 end
 %surf(x1,x3,x0)
 %plot3(x1,x3,x0)

@@ -1,4 +1,4 @@
-function [x_i, exitflag] = find_F_zero(t_interval, F_func, param)
+function [x_i, exitflag] = FFZ_w_o_line_interp(t_interval, F_func, param)
 % FIND_F_ZERO Finds x(t) zeros.
 %	(x_i(t)) = FIND_F_ZERO(T_INTERVAL, F)
 %   Finds x(t) zeros from expression F(t,x_i(t)) = 0.
@@ -55,11 +55,6 @@ exitflag(k) = 4;
      x_i(k + 1) - t_interval(k) .* noise, a - softtol, b + softtol, opts);
     exitflag(k) = 5;
 
-        if(abs(x_i(k) - x_i(k + 1)) > softtol)
-            x_i(k) = x_i(k + 1) + (x_i(k + 2) - x_i(k + 3));
-            exitflag(k) = 6;
-        end
-
     end
 
 end
@@ -80,11 +75,6 @@ exitflag(k) = 4;
     x_i(k) = lsqnonlin(@(x)F_func(t_interval(k), x), ...
      x_i(k - 1) - t_interval(k) .* noise, a - softtol, b + softtol, opts);
     exitflag(k) = 5;
-
-        if(abs(x_i(k) - x_i(k - 1)) > softtol)
-            x_i(k) = x_i(k - 1) + (x_i(k - 2) - x_i(k - 3));
-            exitflag(k) = 6;
-        end
 
     end
 
