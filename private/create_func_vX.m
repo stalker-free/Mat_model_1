@@ -7,14 +7,13 @@ function vX = create_func_vX(funcs_t, const_vect, p)
 
 function [ax0, ax1, ax3] = vX_aux(t, x)
     
-% t = (t_-min(t_))./(max(t_)-min(t_));
-% x = (x_-min(x_))./(max(x_)-min(x_));
-
-res = zeros(3,length(t));
-
+size_t = length(t);
 tol = 1e-12;
 
-for k = 1:length(res)
+if(size_t > 1)
+res = zeros(3,size_t);
+
+for k = 1:size(res,2)
 b0 = const_vect(1) + p * integral(@(nu)b_0(funcs_t, nu, 1), tol, ...
     t(k)+x(k)) - p * integral(@(nu)b_0(funcs_t, nu, 2), tol, t(k) - x(k));
 b1 = const_vect(2) + p * integral(@(nu)b_1(funcs_t, nu, 1), tol, ...
@@ -24,6 +23,22 @@ b3 = const_vect(3) + p * integral(@(nu)b_3(funcs_t, nu, 1), tol, ...
 
 res(:,k) = [b0 b1 b3];
 end
+
+else % if(size_t > 1)
+res = zeros(3,length(x));
+
+for k = 1:size(res,2)
+b0 = const_vect(1) + p * integral(@(nu)b_0(funcs_t, nu, 1), tol, ...
+    t + x(k)) - p * integral(@(nu)b_0(funcs_t, nu, 2), tol, t - x(k));
+b1 = const_vect(2) + p * integral(@(nu)b_1(funcs_t, nu, 1), tol, ...
+    t + x(k)) - p * integral(@(nu)b_1(funcs_t, nu, 2), tol, t - x(k));
+b3 = const_vect(3) + p * integral(@(nu)b_3(funcs_t, nu, 1), tol, ...
+    t + x(k)) - p * integral(@(nu)b_3(funcs_t, nu, 2), tol, t - x(k));
+
+res(:,k) = [b0 b1 b3];
+end
+
+end % if(size_t > 1)
 
 ax0 = res(1,:);
 ax1 = res(2,:);

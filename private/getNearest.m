@@ -1,4 +1,7 @@
 function [a,b] = getNearest(asymptote, init, ti)
+% GETNEAREST Find nearest to point
+%   [A,B] = GETNEAREST(ASYMPTOTE, INIT, TI)
+% Find nearest bounds from asymptotes to the point.
     for i=length(asymptote):-1:1
         asympt_temp(i) = asymptote{i}(ti);
     end

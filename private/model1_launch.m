@@ -13,8 +13,19 @@ end
 [const_plus, const_minus] = data_load( cat(2, dirname, filename) );
 [x_interval, t_interval] = form_intervals(4000, -5.0, 5.0, -10.0, 10.0);
 
-[x_i, x0, x1, x3] = model1(const_plus, const_minus, x_interval, ...
+% Step 3-10
+[x_i, x0, x1, x3, vX] = model1(const_plus, const_minus, x_interval, ...
     t_interval, F_zero);
 
 draw_x_i(t_interval, x_i);
 draw_iX(x0, x1, x3, 1, length(x_interval));
+
+st_t = 1;
+fin_t = 4001;
+st_x = 1;
+fin_x = 4001;
+parts = 201;
+[F, scr] = get_cinema(vX, x_interval, t_interval, ...
+    st_x, fin_x, st_t, fin_t, parts);
+
+cinema(F, scr);

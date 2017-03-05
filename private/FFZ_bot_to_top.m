@@ -1,6 +1,6 @@
 function [x_i, exitflag] = FFZ_bot_to_top(t_interval, F_func, param)
-% FIND_F_ZERO Finds x(t) zeros.
-%	(x_i(t)) = FIND_F_ZERO(T_INTERVAL, F)
+% FFZ_BOT_TO_TOP Finds x(t) zeros.
+%	[X_I, EXITFLAG] = FFZ_BOT_TO_TOP(T_INTERVAL, F_FUNC, PARAM)
 %   Finds x(t) zeros from expression F(t,x_i(t)) = 0.
 %   _i lies in [1, quantity_of_x_zeros].
 %

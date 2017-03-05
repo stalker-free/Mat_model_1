@@ -1,5 +1,10 @@
-function [x_i, x0, x1, x3] = model1(const_plus, const_minus, ...
+function [x_i, x0, x1, x3, vX] = model1(const_plus, const_minus, ...
     x_interval, t_interval, F_zero)
+% MODEL1 Start relativity string modelling
+%   [X_I, X0, X1, X3, VX] = MODEL1(CONST_PLUS, CONST_MINUS, ...
+%    X_INTERVAL, T_INTERVAL, F_ZERO)
+
+
 
 % Step 3
 % a_plus = create_func_a(const_plus);

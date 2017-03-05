@@ -1,8 +1,10 @@
 function [x_i, exitflag] = find_F_zero(t_interval, F_func, param)
 % FIND_F_ZERO Finds x(t) zeros.
-%	(x_i(t)) = FIND_F_ZERO(T_INTERVAL, F)
+%	(x_i(t)) = FIND_F_ZERO(T_INTERVAL, F, PARAM)
 %   Finds x(t) zeros from expression F(t,x_i(t)) = 0.
 %   _i lies in [1, quantity_of_x_zeros].
+%   Can correct some inaccuracies in result and 
+%   can try another point if failed.
 %
 %	See also CREATE_FUNCTIONAL_T, CREATE_FUNC_F.
 
