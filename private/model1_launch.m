@@ -18,7 +18,7 @@ end
     t_interval, F_zero);
 
 draw_x_i(t_interval, x_i);
-draw_iX(x0, x1, x3, 1, length(x_interval));
+draw_iX(x0, x1, x3);
 
 st_t = 1;
 fin_t = 4001;
